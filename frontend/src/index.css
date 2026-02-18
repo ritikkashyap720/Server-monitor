@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    height: 100%;
+  }
+  body {
+    @apply bg-dark-950 text-slate-200 min-h-full min-h-dvh antialiased overflow-hidden font-sans;
+  }
+  #root {
+    @apply min-h-full min-h-dvh flex flex-col;
+  }
+}

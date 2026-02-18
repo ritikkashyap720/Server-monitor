@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: ./backend
+    container_name: server-monitor-backend
+    environment:
+      - PORT=4000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+    networks:
+      - monitor
+
+  frontend:
+    build: ./frontend
+    container_name: server-monitor-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - monitor
+
+networks:
+  monitor:
+    driver: bridge
