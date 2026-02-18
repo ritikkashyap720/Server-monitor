@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useMonitor } from '../context/MonitorContext';
 import { ArrowLeft, Box, Cpu, MemoryStick, Terminal, LayoutList, Clock } from 'lucide-react';
@@ -27,6 +28,8 @@ export default function ContainerDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { containers, details, stats, statsHistory, loading, error, formatUptime } = useMonitor();
+  const [showStats, setShowStats] = useState(true);
+  const [showTerminal, setShowTerminal] = useState(true);
 
   const sortedContainers = sortContainersByStartedAt(containers, details);
   const container = sortedContainers.find((c) => c.id === id);
@@ -65,6 +68,20 @@ export default function ContainerDetail() {
   const memPercent = stat?.memory_percent != null ? `${stat.memory_percent.toFixed(1)}%` : '—';
   const memUsage = stat?.memory_usage != null ? formatBytes(stat.memory_usage) : '—';
   const memLimit = stat?.memory_limit != null ? formatBytes(stat.memory_limit) : '—';
+
+  const viewMode = showStats && showTerminal ? 'both' : showStats ? 'stats' : 'terminal';
+  function setMode(next) {
+    if (next === 'both') {
+      setShowStats(true);
+      setShowTerminal(true);
+    } else if (next === 'stats') {
+      setShowStats(true);
+      setShowTerminal(false);
+    } else {
+      setShowStats(false);
+      setShowTerminal(true);
+    }
+  }
 
   return (
     <div className="flex-1 flex min-h-0 w-full">
@@ -106,7 +123,7 @@ export default function ContainerDetail() {
       </aside>
 
       {/* Main content: flex column so terminal can take remaining height */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
+      <div className={`flex-1 flex flex-col min-w-0 min-h-0 ${showTerminal ? 'overflow-hidden' : 'overflow-auto'}`}>
         {/* Mobile/tablet: container switcher + back */}
         <div className="lg:hidden flex items-center gap-2 p-2 sm:p-3 border-b border-dark-600 bg-dark-900/80 shrink-0">
           <Link to="/" className="p-2.5 sm:p-2 rounded-lg text-slate-400 hover:bg-dark-600 hover:text-slate-200 min-h-touch flex items-center justify-center" aria-label="Back to Dashboard">
@@ -129,12 +146,41 @@ export default function ContainerDetail() {
             <Box className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 text-accent/80" />
             <span className="truncate">{name}</span>
           </h1>
-          <span className="shrink-0 text-[10px] sm:text-xs font-medium px-2 py-1 sm:px-3 rounded-full bg-accent/20 text-accent border border-accent/30">
-            running
-          </span>
+          <div className="shrink-0 flex items-center gap-2">
+            <span className="text-[10px] sm:text-xs font-medium px-2 py-1 sm:px-3 rounded-full bg-accent/20 text-accent border border-accent/30">
+              running
+            </span>
+            <div className="inline-flex rounded-lg border border-dark-600 bg-dark-800/70 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setMode('both')}
+                className={`px-2.5 py-2 text-[10px] sm:text-xs font-medium min-h-touch transition-colors ${viewMode === 'both' ? 'bg-accent/15 text-accent' : 'text-slate-400 hover:text-slate-200 hover:bg-dark-600/60'}`}
+                aria-pressed={viewMode === 'both'}
+              >
+                Both
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('stats')}
+                className={`px-2.5 py-2 text-[10px] sm:text-xs font-medium min-h-touch transition-colors border-l border-dark-600 ${viewMode === 'stats' ? 'bg-accent/15 text-accent' : 'text-slate-400 hover:text-slate-200 hover:bg-dark-600/60'}`}
+                aria-pressed={viewMode === 'stats'}
+              >
+                Stats
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('terminal')}
+                className={`px-2.5 py-2 text-[10px] sm:text-xs font-medium min-h-touch transition-colors border-l border-dark-600 ${viewMode === 'terminal' ? 'bg-accent/15 text-accent' : 'text-slate-400 hover:text-slate-200 hover:bg-dark-600/60'}`}
+                aria-pressed={viewMode === 'terminal'}
+              >
+                Terminal
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Stats row: 1 col mobile, 2 cols sm, 4 cols lg */}
+        {showStats && (
         <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-4 md:p-5 border-b border-dark-600/80">
           <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4">
             <div className="flex items-center gap-2 text-slate-500 mb-2">
@@ -201,8 +247,10 @@ export default function ContainerDetail() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Terminal: fills remaining space in the layout (flex only, no vh) */}
+        {showTerminal && (
         <div className="flex-1 min-h-0 flex flex-col border-t border-dark-600 bg-dark-900/90 overflow-hidden">
           <div className="flex items-center gap-2 px-3 py-2 sm:px-4 border-b border-dark-600 bg-dark-800 shrink-0 min-w-0">
             <Terminal className="w-4 h-4 shrink-0 text-accent/80" />
@@ -212,6 +260,7 @@ export default function ContainerDetail() {
             <LogsPanel key={container.id} containerId={container.id} fullView terminalStyle />
           </div>
         </div>
+        )}
       </div>
     </div>
   );
