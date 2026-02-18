@@ -4,6 +4,8 @@ services:
     container_name: server-monitor-backend
     environment:
       - PORT=4002
+      - MONITOR_USER=admin
+      - MONITOR_PASSWORD=admin
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
