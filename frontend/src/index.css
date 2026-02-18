@@ -7,9 +7,9 @@
     height: 100%;
   }
   body {
-    @apply bg-dark-950 text-slate-200 min-h-full min-h-dvh antialiased overflow-hidden font-sans;
+    @apply bg-dark-950 text-slate-200 h-full min-h-dvh antialiased overflow-hidden font-sans;
   }
   #root {
-    @apply min-h-full min-h-dvh flex flex-col;
+    @apply h-full min-h-dvh flex flex-col overflow-hidden;
   }
 }

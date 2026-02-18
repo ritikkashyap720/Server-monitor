@@ -1,11 +1,13 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { useAuth } from './AuthContext';
 
 const HISTORY_LEN = 48;
 
-function getWsUrl() {
+function getWsUrl(token) {
   const { protocol, host } = window.location;
   const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
-  return `${wsProtocol}//${host}/ws`;
+  const base = `${wsProtocol}//${host}/ws`;
+  return token ? `${base}?token=${encodeURIComponent(token)}` : base;
 }
 
 function formatUptime(seconds) {
@@ -25,6 +27,7 @@ function formatUptime(seconds) {
 const MonitorContext = createContext(null);
 
 export function MonitorProvider({ children }) {
+  const { token } = useAuth();
   const [containers, setContainers] = useState([]);
   const [details, setDetails] = useState({});
   const [stats, setStats] = useState({});
@@ -36,7 +39,16 @@ export function MonitorProvider({ children }) {
   const reconnectTimeoutRef = useRef(null);
 
   useEffect(() => {
-    const url = getWsUrl();
+    if (!token) {
+      setLoading(false);
+      setConnected(false);
+      setContainers([]);
+      setDetails({});
+      setStats({});
+      setStatsHistory({ perId: {}, aggCpu: [], aggMem: [] });
+      return;
+    }
+    const url = getWsUrl(token);
     let mounted = true;
 
     function connect() {
@@ -115,7 +127,7 @@ export function MonitorProvider({ children }) {
         wsRef.current = null;
       }
     };
-  }, []);
+  }, [token]);
 
   const value = {
     containers,

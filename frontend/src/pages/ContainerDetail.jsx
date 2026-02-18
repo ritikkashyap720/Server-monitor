@@ -1,6 +1,6 @@
 import { useParams, Link, NavLink, useNavigate } from 'react-router-dom';
 import { useMonitor } from '../context/MonitorContext';
-import { ArrowLeft, Box, Cpu, MemoryStick, Terminal, LayoutList } from 'lucide-react';
+import { ArrowLeft, Box, Cpu, MemoryStick, Terminal, LayoutList, Clock } from 'lucide-react';
 import Sparkline from '../components/Sparkline';
 import LogsPanel from '../components/LogsPanel';
 
@@ -15,12 +15,21 @@ function formatBytes(bytes) {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 }
 
+function sortContainersByStartedAt(containers, details) {
+  return [...containers].sort((a, b) => {
+    const aStart = details[a.id]?.startedAt ? new Date(details[a.id].startedAt).getTime() : 0;
+    const bStart = details[b.id]?.startedAt ? new Date(details[b.id].startedAt).getTime() : 0;
+    return bStart - aStart; // newest first
+  });
+}
+
 export default function ContainerDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { containers, details, stats, statsHistory, loading, error, formatUptime } = useMonitor();
 
-  const container = containers.find((c) => c.id === id);
+  const sortedContainers = sortContainersByStartedAt(containers, details);
+  const container = sortedContainers.find((c) => c.id === id);
   const detail = details[id];
   const stat = stats[id];
   const history = statsHistory.perId[id] || { cpu: [], mem: [] };
@@ -66,7 +75,7 @@ export default function ContainerDetail() {
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Containers</span>
         </div>
         <nav className="flex-1 min-h-0 overflow-auto p-2" aria-label="Containers">
-          {containers.map((c) => {
+          {sortedContainers.map((c) => {
             const cName = c.name || c.id?.slice(0, 12);
             const isActive = c.id === id;
             return (
@@ -98,38 +107,38 @@ export default function ContainerDetail() {
 
       {/* Main content: flex column so terminal can take remaining height */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
-        {/* Mobile: container switcher + back */}
-        <div className="lg:hidden flex items-center gap-2 p-3 border-b border-dark-600 bg-dark-900/80 shrink-0">
-          <Link to="/" className="p-2 rounded-lg text-slate-400 hover:bg-dark-600 hover:text-slate-200" aria-label="Back to Dashboard">
+        {/* Mobile/tablet: container switcher + back */}
+        <div className="lg:hidden flex items-center gap-2 p-2 sm:p-3 border-b border-dark-600 bg-dark-900/80 shrink-0">
+          <Link to="/" className="p-2.5 sm:p-2 rounded-lg text-slate-400 hover:bg-dark-600 hover:text-slate-200 min-h-touch flex items-center justify-center" aria-label="Back to Dashboard">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <select
             value={id}
             onChange={(e) => navigate(`/container/${e.target.value}`)}
-            className="flex-1 min-w-0 rounded-lg bg-dark-700 border border-dark-600 text-slate-200 font-mono text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/50"
+            className="flex-1 min-w-0 rounded-lg bg-dark-700 border border-dark-600 text-slate-200 font-mono text-sm px-3 py-2.5 sm:py-2 min-h-touch focus:outline-none focus:ring-2 focus:ring-accent/50"
           >
-            {containers.map((c) => (
+            {sortedContainers.map((c) => (
               <option key={c.id} value={c.id}>{c.name || c.id?.slice(0, 12)}</option>
             ))}
           </select>
         </div>
 
         {/* Header: title + status */}
-        <div className="shrink-0 flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-5 border-b border-dark-600/80">
-          <h1 className="text-lg sm:text-xl font-bold font-mono text-accent truncate flex items-center gap-2">
-            <Box className="w-5 h-5 shrink-0 text-accent/80" />
-            {name}
+        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 sm:gap-3 px-3 py-2.5 sm:px-4 sm:py-3 md:px-5 border-b border-dark-600/80">
+          <h1 className="text-base sm:text-lg md:text-xl font-bold font-mono text-accent truncate flex items-center gap-2 min-w-0">
+            <Box className="w-4 h-4 sm:w-5 sm:h-5 shrink-0 text-accent/80" />
+            <span className="truncate">{name}</span>
           </h1>
-          <span className="shrink-0 text-xs font-medium px-3 py-1 rounded-full bg-accent/20 text-accent border border-accent/30">
+          <span className="shrink-0 text-[10px] sm:text-xs font-medium px-2 py-1 sm:px-3 rounded-full bg-accent/20 text-accent border border-accent/30">
             running
           </span>
         </div>
 
-        {/* Stats row: compact cards */}
-        <div className="shrink-0 grid grid-cols-2 lg:grid-cols-4 gap-3 p-4 sm:p-5 border-b border-dark-600/80">
-          <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-4">
+        {/* Stats row: 1 col mobile, 2 cols sm, 4 cols lg */}
+        <div className="shrink-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-4 md:p-5 border-b border-dark-600/80">
+          <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4">
             <div className="flex items-center gap-2 text-slate-500 mb-2">
-              <LayoutList className="w-4 h-4" />
+              <LayoutList className="w-4 h-4 shrink-0" />
               <span className="text-[10px] uppercase tracking-wider">Overview</span>
             </div>
             <dl className="space-y-1 text-xs m-0">
@@ -139,16 +148,12 @@ export default function ContainerDetail() {
                 <dt className="text-slate-500">Started</dt>
                 <dd className="font-mono text-slate-300 text-[11px]">{startedAt}</dd>
               </div>
-              <div className="flex justify-between gap-2">
-                <dt className="text-slate-500">Uptime</dt>
-                <dd className="font-mono text-slate-300 tabular-nums">{uptime}</dd>
-              </div>
             </dl>
           </div>
 
-          <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-4">
+          <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4">
             <div className="flex items-center gap-2 text-slate-500 mb-2">
-              <Cpu className="w-4 h-4" />
+              <Cpu className="w-4 h-4 shrink-0" />
               <span className="text-[10px] uppercase tracking-wider">CPU</span>
             </div>
             <div className="flex items-end justify-between gap-2">
@@ -164,9 +169,9 @@ export default function ContainerDetail() {
             )}
           </div>
 
-          <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-4">
+          <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4">
             <div className="flex items-center gap-2 text-slate-500 mb-2">
-              <MemoryStick className="w-4 h-4" />
+              <MemoryStick className="w-4 h-4 shrink-0" />
               <span className="text-[10px] uppercase tracking-wider">Memory</span>
             </div>
             <div className="flex items-end justify-between gap-2">
@@ -183,23 +188,28 @@ export default function ContainerDetail() {
             )}
           </div>
 
-          <div className="col-span-2 lg:col-span-1 rounded-xl border border-dark-600 bg-dark-800/80 p-4 flex flex-col justify-center">
+          <div className="sm:col-span-2 lg:col-span-1 rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4 flex flex-col justify-center">
             <div className="flex items-center gap-2 text-slate-500 mb-2">
-              <Terminal className="w-4 h-4" />
-              <span className="text-[10px] uppercase tracking-wider">Terminal</span>
+              <Clock className="w-4 h-4" />
+              <span className="text-[10px] uppercase tracking-wider">Uptime</span>
             </div>
-            <p className="text-xs text-slate-400">Live logs stream below</p>
+            <div className="flex items-end justify-between gap-2">
+              <span className="text-2xl font-bold tabular-nums text-slate-200">{uptime}</span>
+              <div className="w-16 h-8 shrink-0">
+                <Sparkline values={history.uptime} color={ACCENT_COLOR} height={32} />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Terminal: takes all remaining vertical space */}
-        <div className="flex-1 min-h-[200px] flex flex-col border-t border-dark-600 bg-dark-900/90 overflow-hidden">
-          <div className="flex items-center gap-2 px-4 py-2 border-b border-dark-600 bg-dark-800 shrink-0">
-            <Terminal className="w-4 h-4 text-accent/80" />
-            <span className="text-xs font-medium text-slate-500 uppercase tracking-wider">Terminal — {name}</span>
+        {/* Terminal: fills remaining space in the layout (flex only, no vh) */}
+        <div className="flex-1 min-h-0 flex flex-col border-t border-dark-600 bg-dark-900/90 overflow-hidden">
+          <div className="flex items-center gap-2 px-3 py-2 sm:px-4 border-b border-dark-600 bg-dark-800 shrink-0 min-w-0">
+            <Terminal className="w-4 h-4 shrink-0 text-accent/80" />
+            <span className="text-[10px] sm:text-xs font-medium text-slate-500 uppercase tracking-wider truncate">Terminal — {name}</span>
           </div>
-          <div className="flex-1 min-h-0 overflow-hidden p-3 sm:p-4 flex flex-col">
-            <LogsPanel containerId={container.id} fullView terminalStyle />
+          <div className="flex-1 min-h-0 overflow-hidden p-2 sm:p-3 md:p-4 flex flex-col">
+            <LogsPanel key={container.id} containerId={container.id} fullView terminalStyle />
           </div>
         </div>
       </div>

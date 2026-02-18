@@ -17,16 +17,16 @@ function Overview({ containers, stats, history }) {
     : 0;
 
   return (
-    <section className="mb-4 sm:mb-5">
-      <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 sm:gap-4">
-        <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-4 flex flex-col gap-1 min-h-0 shadow-lg">
+    <section className="mb-3 sm:mb-4 md:mb-5">
+      <div className="grid grid-cols-1 xs:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
+        <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4 flex flex-col gap-1 min-h-0 shadow-lg">
           <div className="flex items-center gap-2 text-slate-500">
             <Box className="w-4 h-4 shrink-0" />
             <span className="text-[10px] sm:text-xs uppercase tracking-wider">Containers</span>
           </div>
           <span className="text-xl sm:text-2xl font-bold tabular-nums text-slate-200">{count}</span>
         </div>
-        <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-4 flex flex-col gap-1 min-h-0 shadow-lg">
+        <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4 flex flex-col gap-1 min-h-0 shadow-lg">
           <div className="flex items-center gap-2 text-slate-500">
             <Cpu className="w-4 h-4 shrink-0" />
             <span className="text-[10px] sm:text-xs uppercase tracking-wider">Avg CPU</span>
@@ -36,7 +36,7 @@ function Overview({ containers, stats, history }) {
             <Sparkline values={cpuHistory} color={ACCENT_COLOR} height={28} />
           </div>
         </div>
-        <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-4 flex flex-col gap-1 min-h-0 shadow-lg">
+        <div className="rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4 flex flex-col gap-1 min-h-0 shadow-lg">
           <div className="flex items-center gap-2 text-slate-500">
             <MemoryStick className="w-4 h-4 shrink-0" />
             <span className="text-[10px] sm:text-xs uppercase tracking-wider">Avg Memory</span>

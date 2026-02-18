@@ -21,13 +21,13 @@ function ContainerCard({ container, detail, stat, history, formatUptime }) {
   const memHistory = history?.mem ?? [];
 
   return (
-    <article className="rounded-xl border border-dark-600 bg-dark-800/80 p-4 sm:p-5 flex flex-col gap-3 min-h-0 transition-all duration-200 hover:bg-dark-700/80 hover:border-accent/30 hover:shadow-glow-sm">
+    <article className="rounded-xl border border-dark-600 bg-dark-800/80 p-3 sm:p-4 md:p-5 flex flex-col gap-2 sm:gap-3 min-h-0 transition-all duration-200 hover:bg-dark-700/80 hover:border-accent/30 hover:shadow-glow-sm">
       <div className="flex items-center justify-between gap-2 min-w-0">
         <span className="font-semibold text-sm sm:text-base font-mono text-accent truncate flex items-center gap-2" title={name}>
           <Box className="w-4 h-4 shrink-0 text-accent/80" />
           {name}
         </span>
-        <span className="shrink-0 text-[11px] font-medium px-2 py-0.5 rounded-full bg-accent/20 text-accent border border-accent/30">running</span>
+        <span className="shrink-0 text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full bg-accent/20 text-accent border border-accent/30">running</span>
       </div>
       <p className="text-xs text-slate-500 truncate" title={container.image}>{container.image}</p>
       <dl className="flex flex-col gap-2.5 flex-1 min-h-0 m-0">
@@ -70,10 +70,10 @@ function ContainerCard({ container, detail, stat, history, formatUptime }) {
         </div>
       </dl>
 
-      <div className="mt-auto pt-3 border-t border-dark-600">
+      <div className="mt-auto pt-2 sm:pt-3 border-t border-dark-600">
         <Link
           to={`/container/${container.id}`}
-          className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium px-4 py-2.5 rounded-lg bg-accent/20 text-accent border border-accent/30 hover:bg-accent/30 hover:text-dark-950 transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-medium px-4 py-3 sm:py-2.5 rounded-lg bg-accent/20 text-accent border border-accent/30 hover:bg-accent/30 hover:text-dark-950 transition-colors min-h-touch"
         >
           View more
           <ChevronRight className="w-4 h-4" />
