@@ -3,7 +3,7 @@ services:
     build: ./backend
     container_name: server-monitor-backend
     environment:
-      - PORT=4000
+      - PORT=4002
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
@@ -14,7 +14,7 @@ services:
     build: ./frontend
     container_name: server-monitor-frontend
     ports:
-      - "3000:80"
+      - "4003:80"
     depends_on:
       - backend
     restart: unless-stopped

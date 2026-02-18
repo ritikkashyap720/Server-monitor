@@ -6,7 +6,7 @@ const { WebSocketServer } = require('ws');
 const Docker = require('dockerode');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4002;
 
 const MONITOR_USER = process.env.MONITOR_USER || 'admin';
 const MONITOR_PASSWORD = process.env.MONITOR_PASSWORD || 'admin';

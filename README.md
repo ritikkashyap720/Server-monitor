@@ -21,7 +21,7 @@ git clone <repo-url> server-monitor && cd server-monitor
 docker compose up -d --build
 ```
 
-Open **http://localhost:3000** (or your VPS IP:3000). The backend talks to the host Docker daemon via the mounted socket.
+Open **http://localhost:4003** (or your VPS IP:4003). The backend talks to the host Docker daemon via the mounted socket.
 
 ## Development
 
@@ -33,7 +33,7 @@ npm install
 npm run dev
 ```
 
-Runs on port 4000. Requires access to `/var/run/docker.sock` (run on the host or mount the socket).
+Runs on port 4002. Requires access to `/var/run/docker.sock` (run on the host or mount the socket).
 
 ### Frontend
 
@@ -43,7 +43,7 @@ npm install
 npm run dev
 ```
 
-Runs on port 3000 and proxies `/api` to the backend.
+Runs on port 4003 and proxies `/api` to the backend.
 
 ## API
 
